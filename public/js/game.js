@@ -490,6 +490,31 @@ class Game {
     getRailCount() {
         return this.localPlayer.rails;
     }
+
+    // Event system for analytics and debugging
+    on(eventName, callback) {
+        if (!this.eventListeners) {
+            this.eventListeners = {};
+        }
+        
+        if (!this.eventListeners[eventName]) {
+            this.eventListeners[eventName] = [];
+        }
+        
+        this.eventListeners[eventName].push(callback);
+    }
+
+    emit(eventName, data) {
+        if (this.eventListeners && this.eventListeners[eventName]) {
+            this.eventListeners[eventName].forEach(callback => {
+                try {
+                    callback(data);
+                } catch (error) {
+                    console.error('Event callback error:', error);
+                }
+            });
+        }
+    }
 }
 
 // Global game instance

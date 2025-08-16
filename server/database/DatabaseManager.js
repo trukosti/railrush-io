@@ -12,31 +12,47 @@ class DatabaseManager {
 
   async init() {
     try {
-      // Initialize Redis connection
-      this.redis = redis.createClient({
-        url: process.env.REDIS_URL || 'redis://localhost:6379'
-      });
+      // Initialize Redis connection (optional)
+      try {
+        this.redis = redis.createClient({
+          url: process.env.REDIS_URL || 'redis://localhost:6379'
+        });
+        
+        this.redis.on('error', (err) => {
+          console.warn('⚠️ Redis connection error (continuing without Redis):', err.message);
+          this.redis = null;
+        });
+        
+        await this.redis.connect();
+        console.log('✅ Redis connection established');
+      } catch (redisError) {
+        console.warn('⚠️ Redis not available, continuing without Redis:', redisError.message);
+        this.redis = null;
+      }
       
-      this.redis.on('error', (err) => {
-        console.error('Redis connection error:', err);
-      });
-      
-      await this.redis.connect();
-      
-      // Initialize PostgreSQL connection
-      this.pg = new Pool({
-        user: process.env.DB_USER || 'postgres',
-        host: process.env.DB_HOST || 'localhost',
-        database: process.env.DB_NAME || 'railrush',
-        password: process.env.DB_PASSWORD || 'password',
-        port: process.env.DB_PORT || 5432,
-      });
+      // Initialize PostgreSQL connection (optional)
+      try {
+        this.pg = new Pool({
+          user: process.env.DB_USER || 'postgres',
+          host: process.env.DB_HOST || 'localhost',
+          database: process.env.DB_NAME || 'railrush',
+          password: process.env.DB_PASSWORD || 'password',
+          port: process.env.DB_PORT || 5432,
+        });
+        
+        // Test PostgreSQL connection
+        await this.pg.query('SELECT 1');
+        console.log('✅ PostgreSQL connection established');
+        
+        // Initialize database tables
+        await this.initTables();
+      } catch (pgError) {
+        console.warn('⚠️ PostgreSQL not available, continuing without database:', pgError.message);
+        this.pg = null;
+      }
       
       this.connected = true;
-      console.log('✅ Database connections established');
-      
-      // Initialize database tables
-      await this.initTables();
+      console.log('✅ Database manager initialized');
       
     } catch (error) {
       console.error('❌ Database initialization failed:', error);
@@ -45,6 +61,11 @@ class DatabaseManager {
   }
 
   async initTables() {
+    if (!this.pg) {
+      console.log('⚠️ PostgreSQL not available, skipping table initialization');
+      return;
+    }
+    
     try {
       // Create players table
       await this.pg.query(`
@@ -94,6 +115,8 @@ class DatabaseManager {
 
   // Player management
   async getPlayer(playerId) {
+    if (!this.pg) return null;
+    
     try {
       const result = await this.pg.query(
         'SELECT * FROM players WHERE player_id = $1',
@@ -107,6 +130,8 @@ class DatabaseManager {
   }
 
   async createPlayer(playerId, name) {
+    if (!this.pg) return null;
+    
     try {
       const result = await this.pg.query(
         'INSERT INTO players (player_id, name) VALUES ($1, $2) RETURNING *',
@@ -120,6 +145,8 @@ class DatabaseManager {
   }
 
   async updatePlayerStats(playerId, score, railsPlaced) {
+    if (!this.pg) return;
+    
     try {
       await this.pg.query(
         `UPDATE players 
@@ -181,6 +208,8 @@ class DatabaseManager {
 
   // Room management with Redis
   async setRoomState(roomId, state) {
+    if (!this.redis) return;
+    
     try {
       await this.redis.set(`room:${roomId}`, JSON.stringify(state), 'EX', 3600); // 1 hour expiry
     } catch (error) {
@@ -189,6 +218,8 @@ class DatabaseManager {
   }
 
   async getRoomState(roomId) {
+    if (!this.redis) return null;
+    
     try {
       const state = await this.redis.get(`room:${roomId}`);
       return state ? JSON.parse(state) : null;
@@ -199,6 +230,8 @@ class DatabaseManager {
   }
 
   async removeRoom(roomId) {
+    if (!this.redis) return;
+    
     try {
       await this.redis.del(`room:${roomId}`);
     } catch (error) {
