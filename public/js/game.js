@@ -132,6 +132,8 @@ class Game {
         const localPlayer = this.gameState.players.find(p => p.id === this.playerId);
         if (localPlayer) {
             this.localPlayer = { ...localPlayer };
+            // Ensure player starts alive
+            this.localPlayer.alive = true;
         }
         
         console.log('Joined game:', data);
@@ -151,6 +153,16 @@ class Game {
         const maxBufferSize = 5;
         if (this.interpolationBuffer.length > maxBufferSize) {
             this.interpolationBuffer.shift();
+        }
+        
+        // Update local player state from server
+        if (this.playerId) {
+            const serverPlayer = data.players.find(p => p.id === this.playerId);
+            if (serverPlayer) {
+                this.localPlayer.alive = serverPlayer.alive;
+                this.localPlayer.score = serverPlayer.score;
+                this.localPlayer.rails = serverPlayer.rails;
+            }
         }
         
         this.lastServerUpdate = Date.now();
@@ -333,6 +345,16 @@ class Game {
     startGameLoop() {
         const gameLoop = () => {
             if (!this.isPlaying) return;
+            
+            // Check if player is still alive
+            if (!this.localPlayer.alive) {
+                console.log('Player died, showing game over');
+                this.isPlaying = false;
+                if (window.ui) {
+                    window.ui.showGameOver(this.localPlayer.score, this.localPlayer.rails);
+                }
+                return;
+            }
             
             // Handle input
             this.handleInput();
