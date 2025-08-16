@@ -91,6 +91,16 @@ class GameRoom {
       }
     }
     
+    // Check if players are on rails
+    for (const [id, player] of this.players) {
+      if (!player.alive) continue;
+      
+      // Oyuncu ray üzerinde mi kontrol et
+      if (!this.isPlayerOnRails(player)) {
+        player.die('off_rails');
+      }
+    }
+    
     // Player vs Resource collisions
     for (const [id, player] of this.players) {
       if (!player.alive) continue;
@@ -239,6 +249,29 @@ class GameRoom {
     });
     
     return true;
+  }
+
+  isPlayerOnRails(player) {
+    // Oyuncu ray üzerinde mi kontrol et
+    // Şimdilik basit bir kontrol - oyuncu merkeze yakınsa ray üzerinde sayılır
+    const centerDistance = Math.sqrt(player.x * player.x + player.y * player.y);
+    
+    // Eğer hiç ray yoksa, oyuncuya biraz zaman ver
+    if (this.rails.length === 0) {
+      return centerDistance < 1000; // Başlangıçta daha geniş alan
+    }
+    
+    // Ray varsa, en yakın ray'a olan mesafeyi kontrol et
+    let minDistance = Infinity;
+    for (const rail of this.rails) {
+      const distance = Math.sqrt(
+        Math.pow(player.x - rail.x, 2) + Math.pow(player.y - rail.y, 2)
+      );
+      minDistance = Math.min(minDistance, distance);
+    }
+    
+    // Ray'a 50 piksel mesafede olabilir
+    return minDistance < 50;
   }
 
   updateSpatialHash() {

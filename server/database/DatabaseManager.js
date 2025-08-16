@@ -15,7 +15,8 @@ class DatabaseManager {
       // Initialize Redis connection (optional)
       try {
         this.redis = redis.createClient({
-          url: process.env.REDIS_URL || 'redis://localhost:6379'
+          url: process.env.REDIS_URL || 'redis://localhost:6379',
+          retry_strategy: () => null // Retry yapma
         });
         
         this.redis.on('error', (err) => {
@@ -23,7 +24,13 @@ class DatabaseManager {
           this.redis = null;
         });
         
-        await this.redis.connect();
+        // 3 saniye timeout ile bağlantı dene
+        const connectPromise = this.redis.connect();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Connection timeout')), 3000)
+        );
+        
+        await Promise.race([connectPromise, timeoutPromise]);
         console.log('✅ Redis connection established');
       } catch (redisError) {
         console.warn('⚠️ Redis not available, continuing without Redis:', redisError.message);

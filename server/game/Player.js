@@ -4,9 +4,9 @@ class Player {
     this.name = name;
     this.skin = skin;
     
-    // Position and movement
-    this.x = Math.random() * 2000 - 1000;
-    this.y = Math.random() * 2000 - 1000;
+    // Position and movement - Başlangıç pozisyonu merkeze yakın
+    this.x = (Math.random() - 0.5) * 1000; // -500 ile +500 arası
+    this.y = (Math.random() - 0.5) * 1000; // -500 ile +500 arası
     this.vx = 0;
     this.vy = 0;
     this.speed = 0;
@@ -132,7 +132,7 @@ class Player {
   }
 
   checkBoundaries() {
-    const boundary = 3000;
+    const boundary = 5000; // Daha geniş sınır
     
     if (Math.abs(this.x) > boundary || Math.abs(this.y) > boundary) {
       this.die('out_of_bounds');
@@ -180,8 +180,9 @@ class Player {
   }
 
   isOnRails() {
-    // This will be implemented in GameRoom to check against placed rails
-    return true; // Placeholder
+    // Basit ray kontrolü - oyuncu ray üzerinde mi?
+    // Bu metod GameRoom tarafından çağrılacak ve gerçek ray pozisyonları kontrol edilecek
+    return true; // Şimdilik true döndür, daha sonra gerçek kontrol eklenecek
   }
 
   die(reason) {
