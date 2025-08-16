@@ -253,12 +253,11 @@ class GameRoom {
 
   isPlayerOnRails(player) {
     // Oyuncu ray üzerinde mi kontrol et
-    // Şimdilik basit bir kontrol - oyuncu merkeze yakınsa ray üzerinde sayılır
-    const centerDistance = Math.sqrt(player.x * player.x + player.y * player.y);
+    // Test için daha esnek kurallar
     
-    // Eğer hiç ray yoksa, oyuncuya biraz zaman ver
+    // Eğer hiç ray yoksa, oyuncuya çok daha fazla zaman ver
     if (this.rails.length === 0) {
-      return centerDistance < 1000; // Başlangıçta daha geniş alan
+      return true; // Başlangıçta hiç ölmesin
     }
     
     // Ray varsa, en yakın ray'a olan mesafeyi kontrol et
@@ -270,8 +269,8 @@ class GameRoom {
       minDistance = Math.min(minDistance, distance);
     }
     
-    // Ray'a 50 piksel mesafede olabilir
-    return minDistance < 50;
+    // Ray'a 200 piksel mesafede olabilir (çok daha esnek)
+    return minDistance < 200;
   }
 
   updateSpatialHash() {

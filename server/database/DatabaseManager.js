@@ -12,30 +12,39 @@ class DatabaseManager {
 
   async init() {
     try {
-      // Initialize Redis connection (optional)
+      // Redis'i tamamen devre dışı bırak (test için)
+      console.log('⚠️ Redis disabled for testing');
+      this.redis = null;
+      
+      // Initialize PostgreSQL connection (optional)
       try {
-        this.redis = redis.createClient({
-          url: process.env.REDIS_URL || 'redis://localhost:6379',
-          retry_strategy: () => null // Retry yapma
+        this.pg = new Pool({
+          user: process.env.DB_USER || 'postgres',
+          host: process.env.DB_HOST || 'localhost',
+          database: process.env.DB_NAME || 'railrush',
+          password: process.env.DB_PASSWORD || 'password',
+          port: process.env.DB_PORT || 5432,
         });
         
-        this.redis.on('error', (err) => {
-          console.warn('⚠️ Redis connection error (continuing without Redis):', err.message);
-          this.redis = null;
-        });
+        // Test PostgreSQL connection
+        await this.pg.query('SELECT 1');
+        console.log('✅ PostgreSQL connection established');
         
-        // 3 saniye timeout ile bağlantı dene
-        const connectPromise = this.redis.connect();
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Connection timeout')), 3000)
-        );
-        
-        await Promise.race([connectPromise, timeoutPromise]);
-        console.log('✅ Redis connection established');
-      } catch (redisError) {
-        console.warn('⚠️ Redis not available, continuing without Redis:', redisError.message);
-        this.redis = null;
+        // Initialize database tables
+        await this.initTables();
+      } catch (pgError) {
+        console.warn('⚠️ PostgreSQL not available, continuing without database:', pgError.message);
+        this.pg = null;
       }
+      
+      this.connected = true;
+      console.log('✅ Database manager initialized');
+      
+    } catch (error) {
+      console.error('❌ Database initialization failed:', error);
+      this.connected = false;
+    }
+  }
       
       // Initialize PostgreSQL connection (optional)
       try {

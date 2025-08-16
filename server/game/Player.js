@@ -4,9 +4,9 @@ class Player {
     this.name = name;
     this.skin = skin;
     
-    // Position and movement - Başlangıç pozisyonu merkeze yakın
-    this.x = (Math.random() - 0.5) * 1000; // -500 ile +500 arası
-    this.y = (Math.random() - 0.5) * 1000; // -500 ile +500 arası
+    // Position and movement - Başlangıç pozisyonu tam merkez
+    this.x = 0; // Tam merkez
+    this.y = 0; // Tam merkez
     this.vx = 0;
     this.vy = 0;
     this.speed = 0;
@@ -132,7 +132,7 @@ class Player {
   }
 
   checkBoundaries() {
-    const boundary = 5000; // Daha geniş sınır
+    const boundary = 10000; // Çok daha geniş sınır
     
     if (Math.abs(this.x) > boundary || Math.abs(this.y) > boundary) {
       this.die('out_of_bounds');
@@ -169,13 +169,14 @@ class Player {
       otherPlayer.vx *= 0.5;
       otherPlayer.vy *= 0.5;
       
-      // Check if either player goes off rails
-      if (!this.isOnRails()) {
-        this.die('collision');
-      }
-      if (!otherPlayer.isOnRails()) {
-        otherPlayer.die('collision');
-      }
+      // Check if either player goes off rails (daha esnek)
+      // Şimdilik çarpışmada ölmesinler
+      // if (!this.isOnRails()) {
+      //   this.die('collision');
+      // }
+      // if (!otherPlayer.isOnRails()) {
+      //   otherPlayer.die('collision');
+      // }
     }
   }
 
