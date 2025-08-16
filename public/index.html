@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailRush.io - Dinamik Ray Döşeme Kapışması</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="screen">
+        <div class="loading-content">
+            <h1 class="game-title">🚂 RailRush.io</h1>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <p class="loading-text">Yükleniyor...</p>
+        </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div id="mainMenu" class="screen hidden">
+        <div class="menu-content">
+            <h1 class="game-title">🚂 RailRush.io</h1>
+            <p class="game-subtitle">Dinamik Ray Döşeme Kapışması</p>
+            
+            <div class="menu-buttons">
+                <button id="playButton" class="menu-button primary">OYNA</button>
+                <button id="customizeButton" class="menu-button">ÖZELLEŞTİR</button>
+                <button id="leaderboardButton" class="menu-button">LİDER TABLOSU</button>
+                <button id="settingsButton" class="menu-button">AYARLAR</button>
+            </div>
+            
+            <div class="menu-stats">
+                <div class="stat">
+                    <span class="stat-label">Aktif Oyuncular:</span>
+                    <span id="activePlayers" class="stat-value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Aktif Oyunlar:</span>
+                    <span id="activeGames" class="stat-value">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Name Input Screen -->
+    <div id="nameInputScreen" class="screen hidden">
+        <div class="input-content">
+            <h2>Oyuncu Adını Gir</h2>
+            <div class="input-group">
+                <input type="text" id="playerNameInput" placeholder="Oyuncu adınız..." maxlength="15">
+                <button id="startGameButton" class="menu-button primary">OYUNA BAŞLA</button>
+            </div>
+            <button id="backToMenuButton" class="menu-button secondary">GERİ</button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen hidden">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- Game UI -->
+        <div class="game-ui">
+            <div class="top-bar">
+                <div class="player-info">
+                    <span id="playerName" class="player-name"></span>
+                    <span id="playerScore" class="player-score">0</span>
+                </div>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <span class="stat-icon">🚂</span>
+                        <span id="railCount" class="stat-value">50</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">⚡</span>
+                        <span id="speedValue" class="stat-value">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls-hint">
+                <div class="control-item">
+                    <span class="key">WASD</span>
+                    <span class="action">Hareket</span>
+                </div>
+                <div class="control-item">
+                    <span class="key">SPACE</span>
+                    <span class="action">Ray Döş</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="overlay hidden">
+            <div class="game-over-content">
+                <h2>Oyun Bitti!</h2>
+                <div class="final-stats">
+                    <div class="final-stat">
+                        <span class="stat-label">Skor:</span>
+                        <span id="finalScore" class="stat-value">0</span>
+                    </div>
+                    <div class="final-stat">
+                        <span class="stat-label">Ray Sayısı:</span>
+                        <span id="finalRails" class="stat-value">0</span>
+                    </div>
+                </div>
+                <div class="game-over-buttons">
+                    <button id="playAgainButton" class="menu-button primary">TEKRAR OYNA</button>
+                    <button id="mainMenuButton" class="menu-button secondary">ANA MENÜ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Screen -->
+    <div id="leaderboardScreen" class="screen hidden">
+        <div class="leaderboard-content">
+            <h2>🏆 Lider Tablosu</h2>
+            <div id="leaderboardList" class="leaderboard-list">
+                <!-- Leaderboard items will be populated here -->
+            </div>
+            <button id="leaderboardBackButton" class="menu-button secondary">GERİ</button>
+        </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settingsScreen" class="screen hidden">
+        <div class="settings-content">
+            <h2>⚙️ Ayarlar</h2>
+            <div class="settings-group">
+                <label for="soundVolume">Ses Seviyesi:</label>
+                <input type="range" id="soundVolume" min="0" max="100" value="50">
+                <span id="soundValue">50%</span>
+            </div>
+            <div class="settings-group">
+                <label for="musicVolume">Müzik Seviyesi:</label>
+                <input type="range" id="musicVolume" min="0" max="100" value="30">
+                <span id="musicValue">30%</span>
+            </div>
+            <div class="settings-group">
+                <label for="particleEffects">Parçacık Efektleri:</label>
+                <input type="checkbox" id="particleEffects" checked>
+            </div>
+            <div class="settings-group">
+                <label for="showFPS">FPS Göster:</label>
+                <input type="checkbox" id="showFPS">
+            </div>
+            <button id="settingsBackButton" class="menu-button secondary">GERİ</button>
+        </div>
+    </div>
+
+    <!-- Customize Screen -->
+    <div id="customizeScreen" class="screen hidden">
+        <div class="customize-content">
+            <h2>🎨 Özelleştir</h2>
+            <div class="skin-selection">
+                <h3>Vagon Skini</h3>
+                <div class="skin-grid" id="skinGrid">
+                    <!-- Skins will be populated here -->
+                </div>
+            </div>
+            <div class="trail-selection">
+                <h3>İz Efekti</h3>
+                <div class="trail-grid" id="trailGrid">
+                    <!-- Trail effects will be populated here -->
+                </div>
+            </div>
+            <button id="customizeBackButton" class="menu-button secondary">GERİ</button>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop>
+        <source src="assets/music/background.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="railSound">
+        <source src="assets/sounds/rail.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="collectSound">
+        <source src="assets/sounds/collect.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="collisionSound">
+        <source src="assets/sounds/collision.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html> 

@@ -1,0 +1,35 @@
+{
+  "name": "railrush-io",
+  "version": "1.0.0",
+  "description": "Dinamik ray döşeme kapışması oyunu",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "build": "webpack --mode production",
+    "dev-client": "webpack serve --mode development"
+  },
+  "keywords": ["game", "io", "multiplayer", "rail", "racing"],
+  "author": "RailRush Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "redis": "^4.6.7",
+    "pg": "^8.11.3",
+    "uuid": "^9.0.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "compression": "^1.7.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "html-webpack-plugin": "^5.5.3",
+    "css-loader": "^6.8.1",
+    "style-loader": "^3.3.3",
+    "file-loader": "^6.2.0"
+  }
+} 
