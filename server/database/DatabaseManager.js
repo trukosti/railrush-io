@@ -16,59 +16,12 @@ class DatabaseManager {
       console.log('⚠️ Redis disabled for testing');
       this.redis = null;
       
-      // Initialize PostgreSQL connection (optional)
-      try {
-        this.pg = new Pool({
-          user: process.env.DB_USER || 'postgres',
-          host: process.env.DB_HOST || 'localhost',
-          database: process.env.DB_NAME || 'railrush',
-          password: process.env.DB_PASSWORD || 'password',
-          port: process.env.DB_PORT || 5432,
-        });
-        
-        // Test PostgreSQL connection
-        await this.pg.query('SELECT 1');
-        console.log('✅ PostgreSQL connection established');
-        
-        // Initialize database tables
-        await this.initTables();
-      } catch (pgError) {
-        console.warn('⚠️ PostgreSQL not available, continuing without database:', pgError.message);
-        this.pg = null;
-      }
+      // PostgreSQL'i de devre dışı bırak (test için)
+      console.log('⚠️ PostgreSQL disabled for testing');
+      this.pg = null;
       
       this.connected = true;
-      console.log('✅ Database manager initialized');
-      
-    } catch (error) {
-      console.error('❌ Database initialization failed:', error);
-      this.connected = false;
-    }
-  }
-      
-      // Initialize PostgreSQL connection (optional)
-      try {
-        this.pg = new Pool({
-          user: process.env.DB_USER || 'postgres',
-          host: process.env.DB_HOST || 'localhost',
-          database: process.env.DB_NAME || 'railrush',
-          password: process.env.DB_PASSWORD || 'password',
-          port: process.env.DB_PORT || 5432,
-        });
-        
-        // Test PostgreSQL connection
-        await this.pg.query('SELECT 1');
-        console.log('✅ PostgreSQL connection established');
-        
-        // Initialize database tables
-        await this.initTables();
-      } catch (pgError) {
-        console.warn('⚠️ PostgreSQL not available, continuing without database:', pgError.message);
-        this.pg = null;
-      }
-      
-      this.connected = true;
-      console.log('✅ Database manager initialized');
+      console.log('✅ Database manager initialized (no database)');
       
     } catch (error) {
       console.error('❌ Database initialization failed:', error);
